@@ -1,3 +1,6 @@
+using Hangfire;
+using Hangfire.Storage.SQLite;
+using ProductCatalogApp.Api.Jobs;
 using Mapster;
 using MapsterMapper;
 using ProductCatalogApp.Api.Mapping;
@@ -62,6 +65,18 @@ mapping.Compile();
 builder.Services.AddSingleton(mapping);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 
+builder.Services.AddScoped<MonitoringJobs>();
+builder.Services.AddHangfire(configuration => configuration
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSQLiteStorage(Path.Combine(builder.Environment.ContentRootPath, "hangfire.db"),
+        new SQLiteStorageOptions { QueuePollInterval = TimeSpan.FromSeconds(1) }));
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = 1;
+    options.SchedulePollingInterval = TimeSpan.FromSeconds(1);
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -89,6 +104,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
+
+app.UseHangfireDashboard("/hangfire");
+var recurring = app.Services.GetRequiredService<IRecurringJobManager>();
+recurring.AddOrUpdate<MonitoringJobs>("cleanup-readings", job => job.CleanupReadings(), "0 */12 * * *", new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
+recurring.AddOrUpdate<MonitoringJobs>("inventory-summary", job => job.InventoryReport("Периодическая сводка"), Cron.Minutely(), new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
 
 app.MapControllers();
 app.MapHub<MonitoringHub>("/hubs/monitoring").RequireAuthorization();

@@ -13,6 +13,7 @@ namespace ProductCatalogApp.Api.Data
         {
         }
 
+        public DbSet<JobExecution> JobExecutions => Set<JobExecution>();
         public DbSet<Sensor> Sensors => Set<Sensor>();
         public DbSet<SensorReading> SensorReadings => Set<SensorReading>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
