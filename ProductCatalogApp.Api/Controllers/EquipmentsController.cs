@@ -1,3 +1,4 @@
+using ProductCatalogApp.Api.Queries;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -12,16 +13,10 @@ namespace ProductCatalogApp.Api.Controllers;
 public class EquipmentsController(ApplicationDbContext db, IMapper mapper, TypeAdapterConfig mapping) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<EquipmentDto>>> GetAll([FromQuery] int? productionSiteId, [FromQuery] string? search)
+    public async Task<ActionResult<List<EquipmentDto>>> GetAll([FromQuery] EquipmentQuery options)
     {
-        var query = db.EquipmentItems.AsNoTracking();
-        if (productionSiteId.HasValue) query = query.Where(e => e.ProductionSiteId == productionSiteId);
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            var term = search.Trim();
-            query = query.Where(e => e.Name.Contains(term) || e.Model.Contains(term) || e.InventoryNumber.Contains(term));
-        }
-        return Ok(await query.OrderBy(e => e.Name).ProjectToType<EquipmentDto>(mapping).ToListAsync());
+        var query = db.EquipmentItems.AsNoTracking().Apply(options);
+        return Ok(await query.ProjectToType<EquipmentDto>(mapping).ToListAsync());
     }
 
     [HttpGet("{id:int}")]
