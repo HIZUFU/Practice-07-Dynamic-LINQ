@@ -1,0 +1,23 @@
+@model ProductCatalogApp.Client.Models.JobsViewModel
+@{ ViewData["Title"] = "Фоновые задачи"; }
+<h1>Фоновые задачи</h1>
+@if (TempData["Message"] is string message) { <div class="alert alert-info" role="status">@message</div> }
+<p>Сводка выполняется каждую минуту. Показания старше 7 дней удаляются каждые 12 часов. Время расписания указано в UTC.</p>
+<form asp-action="Run" method="post" class="d-flex flex-wrap gap-2 mb-4">
+<button name="kind" value="run-once" class="btn btn-primary">Разовая сводка</button>
+<button name="kind" value="delayed" class="btn btn-outline-primary">Сводка через 15 секунд</button>
+<button name="kind" value="cleanup" class="btn btn-outline-danger">Запустить очистку</button>
+<a asp-action="Index" class="btn btn-outline-secondary">Обновить</a>
+</form>
+<h2 class="h4">Периодические задачи</h2>
+<table class="table"><thead><tr><th>Задача</th><th>Cron</th><th>Следующий запуск (UTC)</th><th>Последний запуск (UTC)</th></tr></thead><tbody>
+@foreach (var item in Model.Schedules) { <tr><td>@item.Id</td><td>@item.Cron</td><td>@item.NextExecution?.ToString("yyyy-MM-dd HH:mm:ss")</td><td>@item.LastExecution?.ToString("yyyy-MM-dd HH:mm:ss")</td></tr> }
+</tbody></table>
+<h2 class="h4">Отложенные задачи</h2>
+@if (!Model.Scheduled.Any()) { <p>Очередь пуста.</p> }
+<ul>@foreach (var item in Model.Scheduled) { <li>№@item.Id — @item.EnqueueAt.ToString("yyyy-MM-dd HH:mm:ss") UTC</li> }</ul>
+<h2 class="h4">Выполненные задачи</h2>
+<table class="table"><thead><tr><th>Время (UTC)</th><th>Задача</th><th>Результат</th></tr></thead><tbody>
+@foreach (var item in Model.Logs) { <tr><td>@item.CompletedAt.ToString("yyyy-MM-dd HH:mm:ss")</td><td>@item.TaskName</td><td>@item.Summary</td></tr> }
+</tbody></table>
+@if (!Model.Logs.Any()) { <p>Задачи ещё не выполнялись.</p> }

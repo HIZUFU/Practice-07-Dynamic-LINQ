@@ -237,6 +237,28 @@ namespace ProductCatalogApp.Api.Migrations
                     b.ToTable("EquipmentItems");
                 });
 
+            modelBuilder.Entity("ProductCatalogApp.Api.Models.JobExecution", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CompletedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobExecutions");
+                });
+
             modelBuilder.Entity("ProductCatalogApp.Api.Models.ProductionSite", b =>
                 {
                     b.Property<int>("Id")
