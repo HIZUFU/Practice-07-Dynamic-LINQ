@@ -14,7 +14,7 @@ namespace ProductCatalogApp.Client.Services
 
         Task<ApiResult> DeleteProductionSiteAsync(int id);
 
-        Task<List<Equipment>> GetEquipmentAsync(int? productionSiteId = null, string? search = null);
+        Task<List<Equipment>> GetEquipmentAsync(int? productionSiteId = null, string? search = null, string field = "name", string match = "contains", string sortBy = "name", string direction = "asc");
 
         Task<Equipment?> GetEquipmentByIdAsync(int id);
 

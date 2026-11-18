@@ -52,12 +52,12 @@ namespace ProductCatalogApp.Client.Services
             return await ToResultAsync(await _http.DeleteAsync($"{SitesUrl}/{id}"));
         }
 
-        public async Task<List<Equipment>> GetEquipmentAsync(int? productionSiteId = null, string? search = null)
+        public async Task<List<Equipment>> GetEquipmentAsync(int? productionSiteId = null, string? search = null, string field = "name", string match = "contains", string sortBy = "name", string direction = "asc")
         {
             var url = AddQuery(
                 EquipmentUrl,
                 ("productionSiteId", productionSiteId?.ToString()),
-                ("search", search));
+                ("search", search), ("field", field), ("match", match), ("sortBy", sortBy), ("direction", direction));
 
             return await _http.GetFromJsonAsync<List<Equipment>>(url) ?? new();
         }

@@ -10,25 +10,14 @@
     @if (User.IsInRole("Admin")) { <a asp-action="Create" class="btn btn-success">Добавить оборудование</a> }
 </p>
 
-<form asp-action="Index" method="get" class="row g-2 mb-3">
-    <div class="col-sm-6 col-md-4">
-        <label for="productionSiteId" class="form-label">Производственный участок</label>
-        <select id="productionSiteId"
-                name="productionSiteId"
-                asp-items="ViewBag.ProductionSiteId"
-                class="form-select">
-            <option value="">Все участки</option>
-        </select>
-    </div>
-    <div class="col-sm-6 col-md-4">
-        <label for="search" class="form-label">Поиск</label>
-        <input id="search" name="search" value="@ViewData["Search"]" class="form-control"
-               placeholder="Название, модель или инвентарный номер" />
-    </div>
-    <div class="col-12">
-        <button type="submit" class="btn btn-primary">Фильтровать</button>
-        <a asp-action="Index" class="btn btn-secondary">Сбросить</a>
-    </div>
+<form method="get" class="row g-2 mb-3">
+<div class="col-md-4"><label for="productionSiteId" class="form-label">Участок</label><select id="productionSiteId" name="productionSiteId" asp-items="ViewBag.ProductionSiteId" class="form-select"><option value="">Все участки</option></select></div>
+<div class="col-md-4"><label for="field" class="form-label">Искать по</label><select id="field" name="field" asp-items="ViewBag.Fields" class="form-select"></select></div>
+<div class="col-md-4"><label for="match" class="form-label">Условие</label><select id="match" name="match" asp-items="ViewBag.Matches" class="form-select"></select></div>
+<div class="col-md-4"><label for="search" class="form-label">Текст</label><input id="search" name="search" value="@ViewData["Search"]" maxlength="100" class="form-control" /></div>
+<div class="col-md-4"><label for="sortBy" class="form-label">Сортировать по</label><select id="sortBy" name="sortBy" asp-items="ViewBag.Sorts" class="form-select"></select></div>
+<div class="col-md-4"><label for="direction" class="form-label">Порядок</label><select id="direction" name="direction" asp-items="ViewBag.Directions" class="form-select"></select></div>
+<div class="col-12"><button class="btn btn-primary">Применить</button> <a asp-action="Index">Сбросить</a></div>
 </form>
 
 @if (!Model.Any())

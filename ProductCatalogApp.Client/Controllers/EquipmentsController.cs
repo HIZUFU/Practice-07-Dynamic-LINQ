@@ -17,12 +17,21 @@ namespace ProductCatalogApp.Client.Controllers
 
         // GET: Equipments
         // Также выполняет фильтрацию оборудования по площадке.
-        public async Task<IActionResult> Index(int? productionSiteId, string? search)
+        public async Task<IActionResult> Index(int? productionSiteId, string? search, string field = "name", string match = "contains", string sortBy = "name", string direction = "asc")
         {
+            if (!new[] { "name", "model", "inventory" }.Contains(field) ||
+                !new[] { "contains", "starts", "equals" }.Contains(match) ||
+                !new[] { "name", "model", "inventory", "site", "id" }.Contains(sortBy) ||
+                !new[] { "asc", "desc" }.Contains(direction)) return BadRequest();
+            var fields = new Dictionary<string, string> { ["name"] = "Название", ["model"] = "Модель", ["inventory"] = "Инвентарный номер" };
+            ViewData["Fields"] = new SelectList(fields, "Key", "Value", field);
+            ViewData["Sorts"] = new SelectList(new Dictionary<string, string>(fields) { ["site"] = "Участок", ["id"] = "Номер записи" }, "Key", "Value", sortBy);
+            ViewData["Matches"] = new SelectList(new Dictionary<string, string> { ["contains"] = "Содержит", ["starts"] = "Начинается с", ["equals"] = "Совпадает" }, "Key", "Value", match);
+            ViewData["Directions"] = new SelectList(new Dictionary<string, string> { ["asc"] = "По возрастанию", ["desc"] = "По убыванию" }, "Key", "Value", direction);
             await LoadProductionSitesAsync(productionSiteId);
             ViewData["Search"] = search;
 
-            return View(await _api.GetEquipmentAsync(productionSiteId, search));
+            return View(await _api.GetEquipmentAsync(productionSiteId, search, field, match, sortBy, direction));
         }
 
         // GET: Equipments/Details/5
